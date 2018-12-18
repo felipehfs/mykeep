@@ -12,7 +12,7 @@ exports.create = async function(req, res) {
 
 exports.read = async function(req, res) {
     try {
-        const posts = await Post.find()
+        const posts = await Post.find().sort('-createdAt')
         res.json(posts)
     } catch(err) {
         res.status(500).json({ errors: [err]})

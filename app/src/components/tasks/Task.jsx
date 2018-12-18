@@ -2,6 +2,7 @@ import React from 'react'
 import Header from '../template/Header'
 import TaskList from './TaskList'
 import axios from 'axios'
+import { connect} from 'react-redux'
 
 class Task extends React.Component {
 
@@ -23,7 +24,12 @@ class Task extends React.Component {
     }
 
     componentDidMount() {
-        this.refresh()
+        if(this.props.userData.user){
+            axios.defaults.headers.common['authorization'] = `Bearer ${this.props.userData.user.token}`
+            this.refresh()
+        } else {
+            this.props.history.push("/login")
+        }
     }
 
     refresh() {
@@ -85,7 +91,7 @@ class Task extends React.Component {
                 <div className="row mt-4">
                     <div className="col-md-6 offset-md-3">
                         <form onSubmit={this.onSubmit}>
-                            <input type="hidden" value={this.state._id} />
+                            <input type="hidden" value={this.state._id? this.state._id: ''} />
                             <div className="form-group">
                                 <label>Tarefa</label>
                                 <input type="text" name="task" className="form-control"
@@ -109,4 +115,8 @@ class Task extends React.Component {
     }
 }
 
-export default Task
+const mapStateToProps = state => ({
+    userData: state.userReducer
+})
+
+export default connect(mapStateToProps)(Task)

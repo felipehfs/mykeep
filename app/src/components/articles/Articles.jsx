@@ -19,7 +19,7 @@ class Article extends React.Component {
                 <Header />
                 <Link to="/articles/new" className="btn btn-outline-primary mt-3 ml-3">New Article</Link>
                 <div className="container mt-4">
-                    <ArticleList rows={this.state.articles}/>
+                    <ArticleList rows={this.state.articles} />
                 </div>
             </React.Fragment>
         )
