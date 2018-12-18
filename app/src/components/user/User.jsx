@@ -60,8 +60,9 @@ class User extends React.Component {
         } else {
             if (email.length > 0 && password.length >= minLengthPassword){
                 axios.post("http://localhost:3003/login", {email, password}).then(resp => {
+                    console.log(resp.data)
                     this.props.setUser(resp.data)
-                    localStorage.setItem("_user", resp.data)
+                    localStorage.setItem("_user", JSON.stringify(resp.data))
                     this.props.history.push("/")
                 }).catch(err => alert(err))
             }

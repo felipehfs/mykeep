@@ -24,8 +24,9 @@ class Task extends React.Component {
     }
 
     componentDidMount() {
-        if(this.props.userData.user){
-            axios.defaults.headers.common['authorization'] = `Bearer ${this.props.userData.user.token}`
+        const session = JSON.parse(localStorage.getItem('_user'))
+        if(session){
+            axios.defaults.headers.common['Authorization'] = `Bearer ${session.token}`
             this.refresh()
         } else {
             this.props.history.push("/login")
