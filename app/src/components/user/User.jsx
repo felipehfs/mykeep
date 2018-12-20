@@ -1,14 +1,15 @@
 import React from 'react'
 import './User.css'
 import axios from 'axios'
-import {setUser} from "../../store/actions"
-import {bindActionCreators} from 'redux'
+import { setUser } from "../../store/actions"
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
+import { ToastContainer, toast } from 'react-toastify'
 
 const minLengthPassword = 8
 
 class User extends React.Component {
-    constructor(props){
+    constructor(props) {
         super(props)
         this.state = {
             isSignOut: false,
@@ -34,39 +35,52 @@ class User extends React.Component {
         })
     }
 
-    hasCorrectSignout(){
-        const {name, email, password} = this.state
+    hasCorrectSignout() {
+        const { name, email, password } = this.state
         return name.length > 0 && email.length > 0 && password.length >= minLengthPassword
     }
 
     onSubmit(e) {
-        const {name, email, password, isSignOut} = this.state
+        const { name, email, password, isSignOut } = this.state
         e.preventDefault()
-        if (isSignOut){
+        if (isSignOut) {
             if (this.hasCorrectSignout()) {
-                axios.post("http://localhost:3003/register", {name, email, password})
-                .then(resp => {
-                    this.setState({
-                        ...this.state,
-                        name: '',
-                        email: '',
-                        password: '',
-                        isSignOut: false
+                axios.post("http://localhost:3003/register", { name, email, password })
+                    .then(resp => {
+                        this.setState({
+                            ...this.state,
+                            name: '',
+                            email: '',
+                            password: '',
+                            isSignOut: false
+                        })
                     })
-                })
             } else {
-                alert("Preencha os campos devidamente!")
+                this.showError("Preencha os campos devidamente!")
             }
         } else {
-            if (email.length > 0 && password.length >= minLengthPassword){
-                axios.post("http://localhost:3003/login", {email, password}).then(resp => {
+            if (email.length > 0 && password.length >= minLengthPassword) {
+                axios.post("http://localhost:3003/login", { email, password }).then(resp => {
                     console.log(resp.data)
                     this.props.setUser(resp.data)
                     localStorage.setItem("_user", JSON.stringify(resp.data))
                     this.props.history.push("/")
-                }).catch(err => alert(err))
+                }).catch(err => this.showError(err))
+            } else {
+                this.showError("Preencha os campos devidamente!")
             }
         }
+    }
+
+    showError(msg) {
+        toast.error(msg, {
+            position: "top-center",
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            });
     }
 
     onChange(e) {
@@ -77,37 +91,46 @@ class User extends React.Component {
     }
 
     render() {
-        const { isSignOut, name, email, password } = this.state 
+        const { isSignOut, name, email, password } = this.state
         return (
             <React.Fragment>
-                <div style={{ height: '100vh', width: '100%'}} className="d-flex justify-content-center align-items-center bg-dark">
+                <div style={{ height: '100vh', width: '100%' }} className="d-flex justify-content-center align-items-center bg-dark">
                     <div className="card">
                         <div className="card-header">
-                            { isSignOut? "Registrar": "Login"}
+                            {isSignOut ? "Registrar" : "Login"}
                         </div>
                         <div className="card-body">
                             <form onSubmit={this.onSubmit}>
-                                <div className={isSignOut?"form-group": "invisible"}>
+                                <div className={isSignOut ? "form-group" : "invisible"}>
                                     <label htmlFor="name">Nome</label>
-                                    <input name="name" id="name" onChange={this.onChange} 
-                                    type="text" className="form-control"  value={name}/>
+                                    <input name="name" id="name" onChange={this.onChange}
+                                        type="text" className="form-control" value={name} />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="email">E-mail</label>
-                                    <input name="email" id="email" onChange={this.onChange} 
-                                    type="email" className="form-control" value={email}/>
+                                    <input name="email" id="email" onChange={this.onChange}
+                                        type="email" className="form-control" value={email} />
                                 </div>
                                 <div className="form-group">
                                     <label htmlFor="">Senha</label>
                                     <input name="password" onChange={this.onChange}
-                                     type="password" className="form-control" value={password}/>
+                                        type="password" className="form-control" value={password} />
                                 </div>
-                                <a href="" className="register-link" onClick={this.toggleSignOut}>{isSignOut? "Clique para logar": "Clique para registrar"}</a>
-                                <button className={isSignOut?"btn btn-success": "btn btn-primary"}>Login</button>
+                                <a href="" className="register-link" onClick={this.toggleSignOut}>{isSignOut ? "Clique para logar" : "Clique para registrar"}</a>
+                                <button className={isSignOut ? "btn btn-success" : "btn btn-primary"}>Login</button>
                             </form>
                         </div>
                     </div>
                 </div>
+                <ToastContainer
+                    position="top-center"
+                    autoClose={false}
+                    newestOnTop
+                    closeOnClick
+                    rtl={false}
+                    pauseOnVisibilityChange
+                    draggable
+                />
             </React.Fragment>
         )
     }

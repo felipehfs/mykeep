@@ -12,7 +12,7 @@ import './axios'
 import { Provider } from 'react-redux'
 import rootReducer from './store/reducers'
 import * as serviceWorker from './serviceWorker';
-
+import 'react-toastify/dist/ReactToastify.css';
 const store = createStore(rootReducer, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__())
 
 ReactDOM.render(<Provider store={store}><App /></Provider>, 

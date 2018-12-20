@@ -2,13 +2,14 @@ import React from 'react'
 import Header from '../template/Header'
 import TaskList from './TaskList'
 import axios from 'axios'
-import { connect} from 'react-redux'
+import { ToastContainer, toast } from 'react-toastify'
+import { connect } from 'react-redux'
 
 class Task extends React.Component {
 
     constructor(props) {
         super(props)
-        
+
         this.state = {
             _id: null,
             task: '',
@@ -25,7 +26,7 @@ class Task extends React.Component {
 
     componentDidMount() {
         const session = JSON.parse(localStorage.getItem('_user'))
-        if(session){
+        if (session) {
             axios.defaults.headers.common['Authorization'] = `Bearer ${session.token}`
             this.refresh()
         } else {
@@ -44,6 +45,16 @@ class Task extends React.Component {
         })
     }
 
+    showError(message) {
+        toast.error(message, {
+            position: "top-right",
+            autoClose: false,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true
+        });
+    }
     isUpdateMode() {
         return this.state._id !== null
     }
@@ -51,7 +62,8 @@ class Task extends React.Component {
     onSubmit(e) {
         e.preventDefault()
         if (!this.isUpdateMode()) {
-            if(this.state.task.length < 0){
+            if (this.state.task === '') {
+                this.showError("Campo vazio!")
                 return
             }
             axios.post("http://localhost:3003/api/tasks", { title: this.state.task })
@@ -61,7 +73,7 @@ class Task extends React.Component {
         } else {
             axios.put(`http://localhost:3003/api/tasks/${this.state._id}`, { title: this.state.task })
                 .then(resp => this.setState({ ...this.state, task: '', _id: null }))
-                .then(() => this.refresh())
+                .then(() => this.refresh()) 
         }
     }
 
@@ -70,7 +82,7 @@ class Task extends React.Component {
         state.rows[index].done = !state.rows[index].done
         const row = state.rows[index]
         axios.put(`http://localhost:3003/api/tasks/${row._id}`, { title: row.title, done: row.done })
-            .then(resp => this.refresh())
+            .then(resp => this.refresh()).catch(err => this.showError(err))
         this.setState(state)
     }
 
@@ -92,14 +104,14 @@ class Task extends React.Component {
                 <div className="row mt-4">
                     <div className="col-md-6 offset-md-3">
                         <form onSubmit={this.onSubmit}>
-                            <input type="hidden" value={this.state._id? this.state._id: ''} />
+                            <input type="hidden" value={this.state._id ? this.state._id : ''} />
                             <div className="form-group">
                                 <label>Tarefa</label>
                                 <input type="text" name="task" className="form-control"
                                     onChange={this.onChange}
                                     value={this.state.task} />
                             </div>
-                            <button className={this.isUpdateMode()? "btn btn-secondary" :"btn btn-primary"}>{ this.isUpdateMode()? "Save":"Create"}</button>
+                            <button className={this.isUpdateMode() ? "btn btn-secondary" : "btn btn-primary"}>{this.isUpdateMode() ? "Save" : "Create"}</button>
                         </form>
                     </div>
                 </div>
@@ -111,6 +123,15 @@ class Task extends React.Component {
                             onChangeCheck={this.onChangeCheck} />
                     </div>
                 </div>
+                <ToastContainer
+                    position="top-center"
+                    autoClose={false}
+                    newestOnTop
+                    closeOnClick
+                    rtl={false}
+                    pauseOnVisibilityChange
+                    draggable
+                />
             </React.Fragment>
         )
     }
