@@ -117,7 +117,7 @@ class User extends React.Component {
                                         type="password" className="form-control" value={password} />
                                 </div>
                                 <a href="" className="register-link" onClick={this.toggleSignOut}>{isSignOut ? "Clique para logar" : "Clique para registrar"}</a>
-                                <button className={isSignOut ? "btn btn-success" : "btn btn-primary"}>Login</button>
+                                <button className={isSignOut ? "btn btn-success" : "btn btn-primary"}>{isSignOut? "Registrar": "Login"}</button>
                             </form>
                         </div>
                     </div>
